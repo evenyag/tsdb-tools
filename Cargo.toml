@@ -1,0 +1,17 @@
+[package]
+name = "tsdb-tools"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "tsdb-tools"
+path = "bin/tsdb-tools.rs"
+
+[dependencies]
+chrono = "0.4"
+clap = { version = "4", features = [ "derive" ] }
+csv = "1"
+influxdb_line_protocol = { git = "https://github.com/influxdata/influxdb_iox", rev = "d0e6b16" }
+serde = "1"
