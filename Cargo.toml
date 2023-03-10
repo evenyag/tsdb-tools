@@ -15,3 +15,6 @@ clap = { version = "4", features = [ "derive" ] }
 csv = "1"
 influxdb_line_protocol = { git = "https://github.com/influxdata/influxdb_iox", rev = "d0e6b16" }
 serde = "1"
+
+[dev-dependencies]
+tempfile = "3"
