@@ -134,6 +134,10 @@ impl LineWriter {
             // Push fields.
             let mut first_field = true;
             for (name, value) in headers.iter().zip(record.iter()) {
+                // Skip empty field.
+                if value.is_empty() {
+                    continue;
+                }
                 // Is not tag or timestamp.
                 if !self.tags.contains(name) && *name != self.timestamp {
                     if first_field {
