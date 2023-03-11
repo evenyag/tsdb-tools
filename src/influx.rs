@@ -69,8 +69,12 @@ struct FromCsv {
     /// Timestamp column name.
     #[arg(long, default_value = "timestamp")]
     timestamp: String,
+    /// Tag names.
     #[arg(long)]
     tag: Vec<String>,
+    /// Table name prefix.
+    #[arg(long, default_value = "")]
+    table_prefix: String,
 }
 
 impl FromCsv {
@@ -80,6 +84,7 @@ impl FromCsv {
             writer: BufWriter::new(file),
             timestamp: self.timestamp.clone(),
             tags: HashSet::from_iter(self.tag.into_iter()),
+            table_prefix: self.table_prefix,
         };
 
         let input_path = Path::new(&self.input);
@@ -97,6 +102,7 @@ struct LineWriter {
     writer: BufWriter<File>,
     timestamp: String,
     tags: HashSet<String>,
+    table_prefix: String,
 }
 
 impl LineWriter {
@@ -116,7 +122,7 @@ impl LineWriter {
             line.clear();
             let record = result.unwrap();
             // Push measurement.
-            write!(line, "{}", table_name).unwrap();
+            write!(line, "{}{}", self.table_prefix, table_name).unwrap();
             if !self.tags.is_empty() {
                 // Push tags.
                 for (name, value) in headers.iter().zip(record.iter()) {
@@ -279,11 +285,12 @@ host_2,sa-east-1,sa-east-1a,89,Ubuntu16.04LTS,x86,LON,13,0,staging,29,48,5,63,17
             output: output_file.path().to_str().unwrap().to_string(),
             timestamp: "timestamp".to_string(),
             tag: vec!["hostname".to_string(), "region".to_string()],
+            table_prefix: "test_".to_string(),
         };
         from_csv.run();
 
         let mut lines = String::new();
         output_file.as_file().read_to_string(&mut lines).unwrap();
-        assert_eq!(lines, "metric1,hostname=host_0 usage_user=58,usage_system=2 1451606400000000000\nmetric2,region=eu-central-1 usage_user=52,usage_system=13 1451606400000000000\n");
+        assert_eq!(lines, "test_metric1,hostname=host_0 usage_user=58,usage_system=2 1451606400000000000\ntest_metric2,region=eu-central-1 usage_user=52,usage_system=13 1451606400000000000\n");
     }
 }
